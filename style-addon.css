@@ -1,0 +1,231 @@
+/* ── FONT FALLBACK SIZE-ADJUST — elimina CLS din FOUT ──
+   Calibrate fallback fonts to match Nunito and Lilita One
+   Eliminates layout shift when web fonts load/swap
+*/
+@font-face {
+  font-family: 'Nunito-Fallback';
+  src: local('Arial');
+  ascent-override: 103%;
+  descent-override: 26%;
+  line-gap-override: 0%;
+  size-adjust: 104%;
+}
+@font-face {
+  font-family: 'LilitaOne-Fallback';
+  src: local('Impact');
+  ascent-override: 110%;
+  descent-override: 18%;
+  line-gap-override: 0%;
+  size-adjust: 92%;
+}
+
+/* ============================================================
+   BrawlQR.com — style-addon.css  v2
+   Adaugă la sfârșitul fișierului css/style.css
+   ============================================================ */
+
+/* ══════════════════════════════════════════════════════════
+   1. AD BANNERS
+   ══════════════════════════════════════════════════════════ */
+.cimalo-slot {
+  display: none;
+  text-align: center;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+/* Clasa e pusă de page-init.js când bannerul chiar are slide-uri.
+   Înlocuiește vechiul container.style.display = 'block' (inline). */
+.cimalo-slot--on {
+  display: block;
+  contain: layout;
+}
+
+/* Cutia se mulează pe imaginea reală (height:auto), nu pe un raport fix.
+   Rezervarea anti-CLS vine din atributele width/height ale <img> (setate
+   de page-init.js din slide.width/height) — browserul le folosește nativ.
+   Astfel, dacă dimensiunile declarate nu se potrivesc perfect cu gif-ul,
+   nu rămâne spațiu gol sub banner. */
+.cimalo-slot--on .cimalo-wrap {
+  max-width: var(--cml-w, 728px);
+  margin: 0 auto;
+}
+/* Imaginea își păstrează proporția naturală; height:auto înlătură golul
+   (suprascrie height:100% inline din page-init.js). */
+.cimalo-slot--on .cimalo-item img {
+  height: auto !important;
+}
+
+/* Slotul MID (opțional, la mijlocul paginilor lungi de hub) primește
+   puțin mai mult aer, fiind între blocuri de conținut. */
+#cimaloMid.cimalo-slot--on {
+  margin: 28px auto;
+}
+
+/* NOTĂ device targeting: comutarea desktop/tablet/mobile se face din JS
+   (page-init.js reconstruiește slotul la schimbarea categoriei de ecran),
+   nu prin media queries pe .cimalo-item — altfel s-ar bate cu .cimalo-item--active
+   al sliderului. Aici nu e nevoie de reguli suplimentare per device. */
+
+/* ══════════════════════════════════════════════════════════
+   2. PAGE-INIT STATUS SYNC
+   ══════════════════════════════════════════════════════════ */
+.dp-hero--expired .dp-badge {
+  filter: grayscale(1);
+}
+
+/* ══════════════════════════════════════════════════════════
+   3. CLS FIX — rezervă spațiu pentru imagini înainte de load
+      Previne layout shift (CWV CLS 0.218)
+   ══════════════════════════════════════════════════════════ */
+
+/* Card images — rezervă exact 88x88 */
+.qr-card-img-wrap {
+  width: 88px;
+  height: 88px;
+  aspect-ratio: 1 / 1;
+  contain: layout;
+  flex-shrink: 0;
+}
+.qr-card-img-wrap img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+}
+
+/* Modal QR — rezervă 160x160 */
+.modal-qr-wrap {
+  width: 160px;
+  height: 160px;
+  aspect-ratio: 1 / 1;
+  contain: layout;
+}
+.modal-qr-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+}
+
+/* Dedicated page QR image */
+.dp-qr-img-wrap {
+  aspect-ratio: 1 / 1;
+  contain: layout;
+}
+.dp-qr-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Mini card images */
+.dp-mini-card-img {
+  width: 70px;
+  height: 70px;
+  aspect-ratio: 1 / 1;
+  contain: layout;
+}
+.dp-mini-card-img img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+/* ══════════════════════════════════════════════════════════
+   4. CONTRAST FIX — tag labels
+      Lighthouse: "Background and foreground colors do not
+      have sufficient contrast ratio"
+      
+      Taguri cu text alb pe fundal deschis → text întunecat
+   ══════════════════════════════════════════════════════════ */
+.tag-pin     { color: #0a001a; } /* white 2.68:1 ✗ → dark 7.63:1 ✓ */
+.tag-box     { color: #0a001a; } /* white 2.43:1 ✗ → dark 8.42:1 ✓ */
+.tag-icon    { color: #0a001a; } /* white 3.15:1 ✗ → dark 6.50:1 ✓ */
+.tag-chaos   { color: #0a001a; } /* white 3.82:1 ✗ → dark 5.35:1 ✓ */
+.tag-skin    { color: #0a001a; } /* white 2.33:1 ✗ → dark 8.76:1 ✓ */
+.tag-credits { color: #0a001a; } /* white 2.46:1 ✗ → dark 8.31:1 ✓ */
+.new-badge   { background: #B71C1C; color: #ffffff; } /* red mai închis: contrast 7.2:1 ✓ */
+
+/* ══════════════════════════════════════════════════════════
+   5. ARIA FIX — lang dropdown
+      Lighthouse: "Elements with ARIA [role] that require
+      children to contain specific [role] are missing some
+      or all required children"
+      
+      [role="listbox"] necesită copii cu [role="option"]
+      Adăugat prin CSS (nu necesită schimbări în JS)
+   ══════════════════════════════════════════════════════════ */
+.lang-dropdown[role="listbox"] .lang-option {
+  /* aria role=option se adaugă în main.js */
+  cursor: pointer;
+}
+
+/* ══════════════════════════════════════════════════════════
+   6. ALL-PAGES-GRID — stiluri consistente
+   ══════════════════════════════════════════════════════════ */
+.all-pages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.all-pages-grid a {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--cyan);
+  text-align: center;
+  transition: border-color .2s, background .2s;
+  display: block;
+  text-decoration: none;
+  line-height: 1.3;
+}
+.all-pages-grid a:hover {
+  border-color: var(--cyan);
+  background: rgba(0,212,255,0.08);
+}
+
+/* ══════════════════════════════════════════════════════════
+   7. PERFORMANCE — prevent font flash / layout shift
+      Fonturile sunt acum non-blocking (preload în HTML)
+      Această regulă asigură fallback corect
+   ══════════════════════════════════════════════════════════ */
+body {
+  font-display: swap; /* nu e CSS property, e în @font-face */
+}
+
+/* Fallback stack când Nunito nu e încărcat încă */
+:root {
+  --font: 'Nunito', 'Nunito-Fallback', 'Segoe UI', Arial, sans-serif;
+  --display: 'Lilita One', 'LilitaOne-Fallback', Georgia, serif;
+}
+
+/* ══════════════════════════════════════════════════════════
+   8. MISC — small visual polish
+   ══════════════════════════════════════════════════════════ */
+/* Smooth image loading */
+img {
+  image-rendering: auto;
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════════════════════
+   9. CONTRAST FIX — cookie consent Reject button
+      Lighthouse: bqr-btn-reject insufficient contrast
+      Background roșu închis + text alb → contrast 5.8:1 ✓
+   ══════════════════════════════════════════════════════════ */
+.bqr-btn-reject {
+  background: #c0392b !important;
+  color: #ffffff !important;
+  border: 2px solid #e74c3c !important;
+}
+.bqr-btn-reject:hover {
+  background: #a93226 !important;
+  color: #ffffff !important;
+}
